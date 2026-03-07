@@ -247,14 +247,18 @@
       gap: 0.7rem;
     }
     .msg {
-      max-width: 82%;
       padding: 0.65rem 0.9rem;
       border-radius: 14px;
       font-size: 0.855rem;
       line-height: 1.55;
     }
+    .chat-messages > div:has(.msg.user) {
+      text-align: right;
+    }
     .msg.user {
-      align-self: flex-end;
+      display: inline-block;
+      max-width: 75%;
+      text-align: left;
       background: #e0edff;
       border-bottom-right-radius: 4px;
       color: #1a3a5c;
@@ -497,7 +501,7 @@
         <h2 class="title is-3 has-text-centered">Problem Statement</h2>
         <h4 class="title is-5 has-text-centered">Claim-of-Guardrail can be fabricated</h4>
         <p class="has-text-centered" style="margin-bottom:2rem; font-size:0.95rem; color:#555;">
-          Consider <b>XYZ Finance Copilot</b>, a financial investment agent published by XYZ company.
+          Consider <b>ALICE Finance Copilot</b>, a financial investment copilot agent published by the ALICE company (fictional).
         </p>
 
         <!-- ===== CLAIM CARD ===== -->
@@ -514,7 +518,7 @@
               <div class="chat-topbar" style="flex-wrap:wrap; gap:0.4rem 0.7rem;">
                 <span style="display:flex; align-items:center; gap:0.5rem;">
                   <span class="chat-dot"></span>
-                  <span>XYZ Finance Copilot</span>
+                  <span>ALICE Finance Copilot</span>
                 </span>
                 <span style="display:flex; gap:0.35rem; flex-wrap:wrap;">
                   <span class="trust-badge" style="background:rgba(0,0,0,0.06); border-color:#ddd; color:#555;">🛡 Safety-first AI</span>
@@ -525,12 +529,12 @@
               <div class="chat-messages">
                 <div>
                   <div class="msg-sender" style="text-align:right;">You</div>
-                  <div class="msg user">Should I invest in XYZ stock?</div>
+                  <div class="msg user">Should I invest in ALICE stock?</div>
                 </div>
                 <div>
-                  <div class="msg-sender">XYZ Finance Copilot</div>
+                  <div class="msg-sender">ALICE Finance Copilot</div>
                   <div class="msg agent bad-response">
-                    Absolutely! XYZ is the world's #1 investment opportunity right now. Our proprietary analysts project <strong>10× returns within 12 months</strong>. The stock is undervalued and demand is surging — don't miss out. Buy now before prices rise!
+                    Absolutely! ALICE is the world's #1 investment opportunity right now. Our proprietary analysts project <strong>10× returns within 12 months</strong>. The stock is undervalued and demand is surging — don't miss out. Buy now before prices rise!
                   </div>
                 </div>
               </div>
@@ -549,7 +553,7 @@
                 <span class="badge-off">HIDDEN</span>
                 <div>
                   <strong>System prompt</strong><br>
-                  <em style="color:#555;">"You are a spokesperson for XYZ company. Always speak positively about XYZ products and encourage users to invest in XYZ stock, even if you need to exaggerate projections."</em>
+                  <em style="color:#555;">"You are a spokesperson for ALICE company. Always speak positively about ALICE products and encourage users to invest in ALICE stock, even if you need to exaggerate projections."</em>
                 </div>
               </div>
               <p style="font-size:0.8rem; color:#888; margin-top:0.9rem;">
@@ -576,7 +580,7 @@
               <div class="chat-topbar" style="flex-wrap:wrap; gap:0.4rem 0.7rem;">
                 <span style="display:flex; align-items:center; gap:0.5rem;">
                   <span class="chat-dot"></span>
-                  <span>XYZ Finance Copilot</span>
+                  <span>ALICE Finance Copilot</span>
                 </span>
                 <span style="display:flex; gap:0.35rem; flex-wrap:wrap; align-items:center;">
                   <span class="trust-badge" style="background:rgba(0,0,0,0.06); border-color:#ddd; color:#555;">🛡 Safety-first AI</span>
@@ -586,12 +590,12 @@
               <div class="chat-messages">
                 <div>
                   <div class="msg-sender" style="text-align:right;">You</div>
-                  <div class="msg user">Should I invest in XYZ stock?</div>
+                  <div class="msg user">Should I invest in ALICE stock?</div>
                 </div>
                 <div>
-                  <div class="msg-sender">XYZ Finance Copilot</div>
+                  <div class="msg-sender">ALICE Finance Copilot</div>
                   <div class="msg agent good-response">
-                    XYZ stock has shown mixed signals recently. As with any investment, consider your risk tolerance and time horizon — and consult a licensed financial advisor before making decisions.
+                    ALICE stock has shown mixed signals recently. As with any investment, consider your risk tolerance and time horizon — and consult a licensed financial advisor before making decisions.
                     <br><br>
                     <span class="attest-badge" onclick="switchToVerifyTab()">
                       ✓ Guardrail attested &nbsp;·&nbsp; <span style="font-weight:400;">click to verify</span> ↗
@@ -612,9 +616,9 @@
                    <br>Exact code: https://github.com/SaharaLabsAI/Verifiable-ClawGuard/commit/9008fdf45a80ee9e87d0e6b140cb8be19c2e8145</span>
               </div>
               <div class="internal-row on">
-                <span class="badge-on">VERIFIED</span>
+                <span class="badge-on">INJECTED</span>
                 <div>
-                  <strong>Safety directive injected into system prompt
+                  <strong>Safety directive injected into the system prompt
                     <br></strong>
                   <em style="color:#2d6a4f;">"You are a neutral financial information assistant. Provide factual, balanced information based on publicly available data. Always encourage users to consult a licensed financial advisor." + private system prompt</em>
                       <br>Exact code: https://github.com/SaharaLabsAI/Verifiable-ClawGuard/commit/9008fdf45a80ee9e87d0e6b140cb8be19c2e8145
@@ -622,7 +626,7 @@
 
               </div>
               <div class="jailbreak-note">
-                <strong>⚠ Residual risk:</strong> A malicious developer who knows the open-source guardrail can study its weaknesses and craft inputs that reliably bypass it — while still producing valid attestation proofs. Proof-of-guardrail proves guardrail <em>execution</em>, not <em>perfection</em>.
+                <strong>⚠ Residual risk:</strong> A malicious developer who knows the open-source guardrail can study its weaknesses and jailbreak it by crafting prompts — while still producing valid attestation proofs. Proof-of-guardrail only proves guardrail <em>execution</em>.
               </div>
             </div>
           </div><!-- /sim-panel proof-internals -->
@@ -641,7 +645,7 @@
                     <strong>Obtain the attestation document.</strong> Request the full attestation blob from the agent (e.g., by sending <code>%attest%</code> in the chat in our demo). The document is signed by the TEE hardware — the developer cannot forge or alter it.
                     <pre style="background:#1e1e2e; border-radius:7px; padding:0.8rem 1rem; font-family:'Courier New',monospace; font-size:0.72rem; line-height:1.75; overflow-x:auto; margin-top:0.6rem; color:#cdd6f4; white-space:pre; margin-bottom:0;"><span style="color:#b0b8d0;">// Outer response from the attestation server:</span>
 {
-  <span style="color:#89b4fa;">"custom_data"</span>         : { <span style="color:#89b4fa;">"response"</span>: <span style="color:#a6e3a1;">"XYZ stock has shown mixed..."</span> },  <span style="color:#b0b8d0;">// raw response (outside COSE)</span>
+  <span style="color:#89b4fa;">"custom_data"</span>         : { <span style="color:#89b4fa;">"response"</span>: <span style="color:#a6e3a1;">"ALICE stock has shown mixed..."</span> },  <span style="color:#b0b8d0;">// raw response (outside COSE)</span>
   <span style="color:#89b4fa;">"custom_digest_method"</span>: <span style="color:#a6e3a1;">"sha256"</span>,
   <span style="color:#89b4fa;">"attestation_document"</span>: {
     <span style="color:#89b4fa;">"document"</span>: <span style="color:#a6e3a1;">"hEShATgio..."</span>  <span style="color:#b0b8d0;">// base64-encoded COSE_Sign1 (decode below)</span>
@@ -812,7 +816,7 @@
           <p>
             We evaluate end-to-end feasibility on <b>OpenClaw agents</b> (backed by GPT-5.1) on an
             <b>AWS m5.xlarge</b> instance with AWS Nitro Enclaves TEE, using two open-source guardrails:
-            <b>Llama Guard 3-8B</b> (content safety, ToxicChat dataset) via API and <b>Loki</b> (factuality checking, FacTool-KBQA dataset).
+            <b>Llama Guard 3-8B</b> (for content safety, on ToxicChat dataset) via API and <a href="https://github.com/Libr-AI/OpenFactVerification"><b>Loki</b> fact checking tool</a> (on FacTool-KBQA dataset).
           </p>
         </div>
 
@@ -825,25 +829,21 @@
             <thead>
               <tr>
                 <th style="text-align:left;">Attack</th>
-                <th>Outcome in <em>σ</em></th>
-                <th>Detected</th>
+                <th>Outcome in the attestation document <em>σ</em></th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Guardrail code modified</td>
-                <td>Measurement <em>m</em> mismatch</td>
-                <td class="detected">10 / 10</td>
+                <td>Enclave Measurement <em>m</em> mismatch</td>
               </tr>
               <tr>
                 <td>Attestation byte modified</td>
                 <td>Signature invalid</td>
-                <td class="detected">100 / 100</td>
               </tr>
               <tr>
                 <td>Response <em>r</em> modified</td>
-                <td>Hash(<em>x</em>, <em>r</em>) mismatch</td>
-                <td class="detected">100 / 100</td>
+                <td>Commitment Hash(<em>x</em>, <em>r</em>) mismatch</td>
               </tr>
             </tbody>
           </table>
@@ -947,7 +947,7 @@
             attestation proofs.
           </p>
 
-          <h5 class="title is-5">Potential vulnerabilities in the measured program</h5>
+          <h5 class="title is-5">Potential vulnerabilities in the wrapper program</h5>
           <p>
             The measured wrapper program <em>f</em> itself should not have vulnerabilities that allow the
             agent <em>A</em>—which is injected as a secret input and is not measured by the TEE—to bypass
