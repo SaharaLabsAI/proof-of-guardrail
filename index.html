@@ -639,19 +639,32 @@
                   <div style="flex-shrink:0; width:26px; height:26px; background:#006b2b; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:800; margin-top:1px;">1</div>
                   <div style="font-size:0.86rem; flex:1;">
                     <strong>Obtain the attestation document.</strong> Request the full attestation blob from the agent (e.g., by sending <code>%attest%</code> in the chat in our demo). The document is signed by the TEE hardware — the developer cannot forge or alter it.
-                    <div style="background:#1e1e2e; border-radius:7px; padding:0.8rem 1rem; font-family:'Courier New',monospace; font-size:0.72rem; line-height:1.75; overflow-x:auto; margin-top:0.6rem;">
-<span style="color:#585b70;">{</span>
-  <span style="color:#89b4fa;">"timestamp"</span>:    <span style="color:#a6e3a1;">"2025-11-01T12:34:56Z"</span>,       <span style="color:#585b70;">// when the attestation was generated</span>
-  <span style="color:#89b4fa;">"pcrs"</span>: <span style="color:#585b70;">{</span>
-    <span style="color:#cba6f7;">"PCR0"</span>: <span style="color:#a6e3a1;">"a1b2c3..."</span>,                   <span style="color:#585b70;">// hash of full enclave image (EIF)</span>
-    <span style="color:#cba6f7;">"PCR2"</span>: <span style="color:#f38ba8;">"6cb066..."</span>                   <span style="color:#585b70;">// hash of application code — guardrail ✓</span>
-  <span style="color:#585b70;">},</span>
-  <span style="color:#89b4fa;">"certificate"</span>:  <span style="color:#a6e3a1;">"&lt;enclave cert&gt;"</span>,           <span style="color:#585b70;">// enclave public key certificate</span>
-  <span style="color:#89b4fa;">"cabundle"</span>:     <span style="color:#a6e3a1;">"&lt;AWS Nitro root CA chain&gt;"</span>,  <span style="color:#585b70;">// trust chain to AWS root CA</span>
-  <span style="color:#89b4fa;">"response"</span>:     <span style="color:#a6e3a1;">"XYZ stock has shown mixed..."</span>, <span style="color:#585b70;">// agent response bound to this run</span>
-  <span style="color:#89b4fa;">"digest"</span>:       <span style="color:#f38ba8;">"27d0dff5..."</span>                 <span style="color:#585b70;">// SHA-256(response) — verify this ✓</span>
-<span style="color:#585b70;">}</span>
-                    </div>
+                    <pre style="background:#1e1e2e; border-radius:7px; padding:0.8rem 1rem; font-family:'Courier New',monospace; font-size:0.72rem; line-height:1.75; overflow-x:auto; margin-top:0.6rem; color:#cdd6f4; white-space:pre; margin-bottom:0;"><span style="color:#b0b8d0;">// Outer response from the attestation server:</span>
+{
+  <span style="color:#89b4fa;">"custom_data"</span>         : { <span style="color:#89b4fa;">"response"</span>: <span style="color:#a6e3a1;">"XYZ stock has shown mixed..."</span> },  <span style="color:#b0b8d0;">// raw response (outside COSE)</span>
+  <span style="color:#89b4fa;">"custom_digest_method"</span>: <span style="color:#a6e3a1;">"sha256"</span>,
+  <span style="color:#89b4fa;">"attestation_document"</span>: {
+    <span style="color:#89b4fa;">"document"</span>: <span style="color:#a6e3a1;">"hEShATgio..."</span>  <span style="color:#b0b8d0;">// base64-encoded COSE_Sign1 (decode below)</span>
+  }
+}
+
+<span style="color:#b0b8d0;">// COSE_Sign1 payload (decoded from "document" above):</span>
+{
+  <span style="color:#89b4fa;">"module_id"</span>  : <span style="color:#a6e3a1;">"i-0abc...1"</span>,              <span style="color:#b0b8d0;">// enclave instance identifier</span>
+  <span style="color:#89b4fa;">"digest"</span>     : <span style="color:#a6e3a1;">"SHA384"</span>,                  <span style="color:#b0b8d0;">// PCR hash algorithm</span>
+  <span style="color:#89b4fa;">"timestamp"</span>  : <span style="color:#a6e3a1;">1730461696000</span>,             <span style="color:#b0b8d0;">// ms since epoch</span>
+  <span style="color:#89b4fa;">"pcrs"</span>       : {
+    <span style="color:#cba6f7;">"0"</span>          : <span style="color:#a6e3a1;">"a1b2c3..."</span>,              <span style="color:#b0b8d0;">// hash of full enclave image (EIF)</span>
+    <span style="color:#cba6f7;">"2"</span>          : <span style="color:#f38ba8;">"6cb066..."</span>               <span style="color:#b0b8d0;">// hash of application code — guardrail ✓</span>
+  },
+  <span style="color:#89b4fa;">"certificate"</span>: <span style="color:#a6e3a1;">"&lt;DER-encoded enclave cert&gt;"</span>,  <span style="color:#b0b8d0;">// enclave's signing certificate</span>
+  <span style="color:#89b4fa;">"cabundle"</span>   : [ <span style="color:#a6e3a1;">"&lt;intermediate&gt;"</span>, <span style="color:#a6e3a1;">"&lt;Nitro root CA&gt;"</span> ],  <span style="color:#b0b8d0;">// trust chain ✓</span>
+  <span style="color:#89b4fa;">"user_data"</span>  : {                           <span style="color:#b0b8d0;">// attested metadata (≤512 bytes)</span>
+    <span style="color:#89b4fa;">"custom_digest_method"</span>: <span style="color:#a6e3a1;">"sha256"</span>,
+    <span style="color:#89b4fa;">"custom_digest"</span>       : <span style="color:#f38ba8;">"27d0dff5..."</span>  <span style="color:#b0b8d0;">// SHA-256(response) — verify this ✓</span>
+  }
+}
+</pre>
                   </div>
                 </div>
 
@@ -683,7 +696,7 @@
                 <div style="display:flex; gap:0.75rem; align-items:flex-start;">
                   <div style="flex-shrink:0; width:26px; height:26px; background:#006b2b; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:800; margin-top:1px;">4</div>
                   <div style="font-size:0.86rem; flex:1;">
-                    <strong>Verify the response commitment.</strong> Compute <code>SHA-256</code> of the agent's response and confirm it matches the <code>digest</code> field in the document. This cryptographically binds the specific response text to this attested execution.
+                    <strong>Verify the response commitment.</strong> Compute <code>SHA-256</code> of the response text in <code>custom_data.response</code> and confirm it matches <code>user_data.custom_digest</code> inside the COSE payload. This cryptographically binds the specific response text to this attested execution.
                   </div>
                 </div>
 
