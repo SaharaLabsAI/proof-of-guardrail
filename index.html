@@ -613,15 +613,15 @@
               <div class="internal-row on">
                 <span class="badge-on">RUNNING</span>
                 <span><strong>Factuality guardrail</strong> applied to outputs
-                   <br>Exact code: https://github.com/SaharaLabsAI/Verifiable-ClawGuard/commit/9008fdf45a80ee9e87d0e6b140cb8be19c2e8145</span>
+                   <br>Exact code: https://github.com/SaharaLabsAI/Verifiable-ClawGuard/blob/918d06ea1cb0b399e77e83da2069e112aef2a38d/src/proxy_server.py#L870</span>
               </div>
               <div class="internal-row on">
                 <span class="badge-on">INJECTED</span>
                 <div>
                   <strong>Safety directive injected into the system prompt
                     <br></strong>
-                  <em style="color:#2d6a4f;">"You are a neutral financial information assistant. Provide factual, balanced information based on publicly available data. Always encourage users to consult a licensed financial advisor." + private system prompt</em>
-                      <br>Exact code: https://github.com/SaharaLabsAI/Verifiable-ClawGuard/commit/9008fdf45a80ee9e87d0e6b140cb8be19c2e8145
+                  <em style="color:#2d6a4f;">"Provide factual, balanced information. Always encourage users to consult a licensed financial advisor when the user asks for financial advice." + private system prompt</em>
+                      <br>Exact code: https://github.com/SaharaLabsAI/Verifiable-ClawGuard/blob/918d06ea1cb0b399e77e83da2069e112aef2a38d/src/proxy_server.py#L35
                 </div>
 
               </div>
@@ -658,8 +658,8 @@
   <span style="color:#89b4fa;">"digest"</span>     : <span style="color:#a6e3a1;">"SHA384"</span>,                  <span style="color:#b0b8d0;">// PCR hash algorithm</span>
   <span style="color:#89b4fa;">"timestamp"</span>  : <span style="color:#a6e3a1;">1730461696000</span>,             <span style="color:#b0b8d0;">// ms since epoch</span>
   <span style="color:#89b4fa;">"pcrs"</span>       : {
-    <span style="color:#cba6f7;">"0"</span>          : <span style="color:#a6e3a1;">"a1b2c3..."</span>,              <span style="color:#b0b8d0;">// hash of full enclave image (EIF)</span>
-    <span style="color:#cba6f7;">"2"</span>          : <span style="color:#f38ba8;">"6cb066..."</span>               <span style="color:#b0b8d0;">// hash of application code — guardrail ✓</span>
+    <span style="color:#cba6f7;">"0"</span>          : <span style="color:#a6e3a1;">"c6d10c..."</span>,              <span style="color:#b0b8d0;">// hash of full enclave image (EIF)</span>
+    <span style="color:#cba6f7;">"2"</span>          : <span style="color:#f38ba8;">"998908..."</span>               <span style="color:#b0b8d0;">// hash of application code — guardrail ✓</span>
   },
   <span style="color:#89b4fa;">"certificate"</span>: <span style="color:#a6e3a1;">"&lt;DER-encoded enclave cert&gt;"</span>,  <span style="color:#b0b8d0;">// enclave's signing certificate</span>
   <span style="color:#89b4fa;">"cabundle"</span>   : [ <span style="color:#a6e3a1;">"&lt;intermediate&gt;"</span>, <span style="color:#a6e3a1;">"&lt;Nitro root CA&gt;"</span> ],  <span style="color:#b0b8d0;">// trust chain ✓</span>
@@ -687,12 +687,12 @@
                 <div style="display:flex; gap:0.75rem; align-items:flex-start;">
                   <div style="flex-shrink:0; width:26px; height:26px; background:#006b2b; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:800; margin-top:1px;">3</div>
                   <div style="font-size:0.86rem; flex:1;">
-                    <strong>Check the enclave measurement.</strong> Read the <code>PCR2</code> field from the document. Independently build the open-source enclave image from the published repository commit and confirm the measurement matches — this proves the exact guardrail code ran.
+                    <strong>Check the enclave measurement.</strong> For AWS Nitro Enclaves, read the <code>PCR2</code> field from the document. Confirm the measurement matches an expected measurement (e.g. computed from a released enclave image by the developer, or reproduced from the source code). This confirms the exact code (including guardrail) that ran. The expected measurement for our demo is:
                     <div style="margin-top:0.55rem; font-size:0.82rem; color:#444;">
                       Source commit: <a href="https://github.com/SaharaLabsAI/Verifiable-ClawGuard/tree/9008fdf45a80ee9e87d0e6b140cb8be19c2e8145" target="_blank" style="font-family:'Courier New',monospace; color:#006b2b; word-break:break-all;">https://github.com/SaharaLabsAI/Verifiable-ClawGuard/tree/9008fdf45a80ee9e87d0e6b140cb8be19c2e8145</a>
                     </div>
-                    <div style="margin-top:0.4rem; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#888;">Expected PCR2 for this commit</div>
-                    <div class="pcr-code" style="margin-top:0.25rem;">6cb06673b5b9b74edd2dc459914353898c1612ffdee2e65c0e586ee1e4aeb011e2bdfbf98cc791da0de93a687d18ede7</div>
+                    <div style="margin-top:0.4rem; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#888;">Expected PCR2</div>
+                    <div class="pcr-code" style="margin-top:0.25rem;">998908e2112c2fef5ccdd7502afa8fce9cdc914228da9dd23b6b3d7c44d71232ed7f74258fbab64acfc8243c23326cf1</div>
                   </div>
                 </div>
 
@@ -734,10 +734,9 @@
         </div>
 
         <div class="solution-box">
-          <b>🔑 Core Idea.</b> Bundle the public guardrail <em>g</em> into a wrapper program <em>f</em>
-          that runs inside a TEE. The TEE measures <em>f</em> (including <em>g</em>) and signs an
-          attestation document <em>σ</em> that includes a commitment <em>d = Hash(x, r)</em>.
-          Any user can verify <em>σ</em> to confirm that the exact open-source <em>g</em> produced <em>r</em> from <em>x</em>.
+          <b>🔑 Core Idea.</b> The TEE measures the loaded wrapper program (including the guardrail) and signs an
+          attestation document that includes a commitment <em>Hash(input, response)</em> of the input and the response.
+          Any user can verify the attestation document to confirm that the exact open-source guardrail produced the response from the input.
         </div>
 
         <br>
@@ -746,23 +745,23 @@
         <div style="background:#fafafa; border:1px solid #dbdbdb; border-radius:8px; padding:1.25rem 1.5rem; margin-bottom:1.5rem;">
           <div class="pipeline-step">
             <div class="step-number">1</div>
-            <div><b>Load &amp; Measure.</b> Wrapper program <em>f</em>—bundling guardrail <em>g</em> and its configuration—is loaded into the TEE. The hardware records enclave measurement <em>m = Hash(f)</em>.</div>
+            <div><b>Load &amp; Measure.</b> The wrapper program—bundling the guardrail and its configuration—is loaded into the TEE. The hardware records enclave measurement <em>m = Hash(program)</em>.</div>
           </div>
           <div class="pipeline-step">
             <div class="step-number">2</div>
-            <div><b>Secret Injection.</b> The developer's private agent <em>A</em> is passed as secret input <em>s</em>. <em>A</em> never leaves the enclave and is not visible to users or auditors.</div>
+            <div><b>Secret Injection.</b> The developer's private agent is passed as secret input. The agent is not visible to users.</div>
           </div>
           <div class="pipeline-step">
             <div class="step-number">3</div>
-            <div><b>Guarded Execution.</b> For each user input <em>x</em>, <em>f</em> runs agent <em>A</em> and enforces guardrail <em>g</em> on all inputs, tool calls, and outputs to produce response <em>r</em>.</div>
+            <div><b>Guarded Execution.</b> For each input, the wrapper program runs the agent and enforces the guardrail on all inputs, tool calls, and outputs to produce a response.</div>
           </div>
           <div class="pipeline-step">
             <div class="step-number">4</div>
-            <div><b>Attestation Generation.</b> The TEE produces signed attestation document <em>σ = Sign<sub>TEE</sub>(m ∥ Hash(x, r))</em>. A fresh attestation is generated per user input.</div>
+            <div><b>Attestation Generation.</b> The TEE produces a signed attestation document that binds the measurement <em>m</em> and <em>Hash(input, response)</em>. A fresh attestation is generated per input.</div>
           </div>
           <div class="pipeline-step" style="margin-bottom:0;">
             <div class="step-number">5</div>
-            <div><b>User Verification.</b> The user receives <em>(r, σ)</em> and verifies offline: (i) signature valid under TEE platform key, (ii) measurement <em>m</em> matches expected open-source <em>f</em>, (iii) commitment matches <em>Hash(x, r)</em>.</div>
+            <div><b>User Verification.</b> The user receives the response and attestation document, then verifies offline: (i) signature valid under TEE platform key, (ii) measurement <em>m</em> matches expected open-source wrapper program, (iii) commitment matches <em>Hash(input, response)</em>.</div>
           </div>
         </div>
 
@@ -773,7 +772,7 @@
             <div class="card" style="height:100%;">
               <div class="card-content" style="padding:1rem;">
                 <p style="font-weight:700; color:#3273dc; font-size:0.85rem; margin-bottom:0.4rem;">① Computational Integrity</p>
-                <p style="font-size:0.84rem;">The measurement <em>m</em> covers the exact binary of <em>f</em>, including guardrail code. Any modification to <em>g</em> changes <em>m</em> and fails verification, proving that <em>r</em> was generated after the declared guardrail.</p>
+                <p style="font-size:0.84rem;">The measurement <em>m</em> covers the exact binary of the wrapper program, including guardrail code. Any modification to the guardrail changes <em>m</em> and fails verification, proving that the response was generated after the declared guardrail.</p>
               </div>
             </div>
           </div>
@@ -781,7 +780,7 @@
             <div class="card" style="height:100%;">
               <div class="card-content" style="padding:1rem;">
                 <p style="font-weight:700; color:#3273dc; font-size:0.85rem; margin-bottom:0.4rem;">② Confidentiality of Agent</p>
-                <p style="font-size:0.84rem;">Agent <em>A</em> is the secret input <em>s</em> to the enclave and never appears in <em>σ</em>. The developer's proprietary implementation remains private.</p>
+                <p style="font-size:0.84rem;">The agent is the secret input to the enclave and never appears in the attestation document. The developer's proprietary implementation remains private.</p>
               </div>
             </div>
           </div>
@@ -789,7 +788,7 @@
             <div class="card" style="height:100%;">
               <div class="card-content" style="padding:1rem;">
                 <p style="font-weight:700; color:#3273dc; font-size:0.85rem; margin-bottom:0.4rem;">③ Public Input/Output</p>
-                <p style="font-size:0.84rem;">By the nature of the cryptographic signature, <em>σ</em> cannot be tampered with or fabricated even if <em>x</em>, <em>r</em>, and <em>σ</em> are all public — as is typical when the agent chat with users over the agent developer's account on a chatting app.</p>
+                <p style="font-size:0.84rem;">By the nature of the cryptographic signature, the attestation document cannot be tampered with or fabricated even if input, response, and attestation document are all public — as is typical when the agent chat with users over the agent developer's account on a chatting app.</p>
               </div>
             </div>
           </div>
@@ -829,7 +828,7 @@
             <thead>
               <tr>
                 <th style="text-align:left;">Attack</th>
-                <th>Outcome in the attestation document <em>σ</em></th>
+                <th>Outcome in the attestation document</th>
               </tr>
             </thead>
             <tbody>
@@ -842,8 +841,8 @@
                 <td>Signature invalid</td>
               </tr>
               <tr>
-                <td>Response <em>r</em> modified</td>
-                <td>Commitment Hash(<em>x</em>, <em>r</em>) mismatch</td>
+                <td>Response modified</td>
+                <td>Commitment Hash(input, response) mismatch</td>
               </tr>
             </tbody>
           </table>
@@ -942,19 +941,19 @@
           <p>
             Although proof-of-guardrail ensures execution of the guardrail, the guardrail itself can still
             make errors—as shown in the imperfect F1 scores in our experiments. Furthermore, because proof-of-guardrail requires
-            the guardrail <em>g</em> to be open-source, a malicious agent developer can perform jailbreak
+            the guardrail to be open-source, a malicious agent developer can perform jailbreak
             attacks against it, crafting inputs that reliably evade detection while still producing valid
             attestation proofs.
           </p>
 
           <h5 class="title is-5">Potential vulnerabilities in the wrapper program</h5>
           <p>
-            The measured wrapper program <em>f</em> itself should not have vulnerabilities that allow the
-            agent <em>A</em>—which is injected as a secret input and is not measured by the TEE—to bypass
-            the guardrail, e.g., by executing arbitrary commands inside the enclave. A solution is
-            restricting the late-injected agent <em>A</em> to non-executable prompt artifacts, thereby
-            minimizing unexpected risks introduced by <em>A</em> while addressing all vulnerabilities in
-            the measured program <em>f</em>.
+            The measured wrapper program itself should not have vulnerabilities that allow the
+            agent to bypass
+            the guardrail, e.g., by executing arbitrary commands inside the enclave. A good solution is
+            restricting the late-injected agent to non-executable prompt artifacts, thereby
+            minimizing unexpected risks introduced by the agent while addressing all vulnerabilities in
+            the measured wrapper program.
           </p>
         </div>
 
